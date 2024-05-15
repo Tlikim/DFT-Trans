@@ -1,0 +1,13 @@
+CUDA_VISIBLE_DEVICES=0 python3 code/run_glue.py \
+   --task_name QNLI \
+   --model /root/autodl-tmp/our_bert \
+   --do_train \
+   --do_eval \
+   --data_dir ./data/QNLI \
+   --train_batch_size 32 \
+   --eval_batch_size 32 \
+   --eval_per_epoch 2 \
+   --num_train_epochs 30  \
+   --max_seq_length 256 \
+   --learning_rate 3e-5 \
+   --output_dir QNLI_DIR 
