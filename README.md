@@ -1,5 +1,4 @@
 # DFT-Trans
-[中文版](./README_zh.md)  
 This is the official implementation of paper "DFT-Trans: Pretraining Cost Reduction via Domain Mixing Tokens of Time and Frequency for NLP Tasks"  
 ## Pretrain Corpus
 We are providing the corpus used to pretrain the model.  
