@@ -1,12 +1,11 @@
 from datasets import load_dataset, load_metric
 from transformers import AlbertTokenizerFast, TrainingArguments, Trainer, AlbertConfig# , BertForPreTraining
-from svt_bert_pretrain import BertForPreTraining
 from transformers.tokenization_utils_base import PreTrainedTokenizerBase, PaddingStrategy, BatchEncoding
 from typing import Optional, Union, List, Dict, Tuple
 import torch
 from torch import nn
 from functools import partial
-from svt_pretrain import SVTForPretraining
+from dft_pretrain import DFTForPretraining
 from dataclasses import dataclass
 def compute_metrics(eval_predictions):
     labels, next_sentence_label=eval_predictions.label_ids
@@ -17,8 +16,8 @@ def compute_metrics(eval_predictions):
     mask = torch.logical_not(labels.eq(-100))
     mlm_acc = mlm_acc.logical_and(mask)
     mlm_correct = mlm_acc.sum().item()
-    mlm_total = mask.sum().item()  # 需要预测的个数
-    mlm_acc = float(mlm_correct) / mlm_total  # 计算被mask掉的词语的个数然后计算准确率
+    mlm_total = mask.sum().item()
+    mlm_acc = float(mlm_correct) / mlm_total
 
     nsp_correct = (seq_relationship_score.argmax(1) == next_sentence_label).float().sum()
     nsp_total = len(next_sentence_label)
@@ -80,17 +79,12 @@ class DataCollatorForLanguageModeling:
         """
         Prepare masked tokens inputs/labels for masked language modeling: 80% MASK, 10% random, 10% original.
         """
-        '''
-        inputs必须为tensor类型，
-        '''
 
-        # 这里的labels指的是哪些字要被mask
         labels = inputs.clone()
         # We sample a few tokens in each sequence for MLM training (with probability `self.mlm_probability`)
-        # 生成一个全为0.15 的矩阵，维度和inputs的大小一样。
         probability_matrix = torch.full(labels.shape, self.mlm_probability)
-        # 这里的spcial_tokens指的是cls，sep,pad等，special_tokens_mask的维度和inputs一样，
-        # 特殊token的位置是true，其他位置是false
+        # Here, special_tokens refers to cls, sep,pad, etc. 
+        # The position of the special token is true, the other positions are false
         if special_tokens_mask is None:
             special_tokens_mask = [
                 self.tokenizer.get_special_tokens_mask(val, already_has_special_tokens=True) for val in labels.tolist()
@@ -98,12 +92,12 @@ class DataCollatorForLanguageModeling:
             special_tokens_mask = torch.tensor(special_tokens_mask, dtype=torch.bool)
         else:
             special_tokens_mask = special_tokens_mask.bool()
-        # masked_fill_函数的作用是会根据special_tokens_mask中true的位置，将probability_matrix中对于的位置置为0
-        # 前面special_tokens_mask已经将cls等特殊字符的位置置为true,也就是通过将probability_matrix中特殊字符的位置置0，从而
-        # 不会mask掉特殊字符。
+        # The masked_fill_ function sets the position of true in special_tokens_mask to 0 in the probability_matrix.
+        # The previous special_tokens_mask has already set the position of special characters such as cls to true, i.e., by setting the position of special characters in the probability_matrix to 0,
+        # so as not to mask out special characters.
         probability_matrix.masked_fill_(special_tokens_mask, value=0.0)
-        # Bert是将句子中15%的词随机mask掉，也就是每个词有15%的概率被mask掉（1），有85%的概率不被mask掉（0），
-        # 因此可以建模为伯努利分布，参数p=0.15，
+        # Bert is to randomly mask off 15% of the words in a sentence, that is, each word has a 15% probability of being masked off (1) and an 85% probability of not being masked off (0).
+        # can therefore be modelled as a Bernoulli distribution with parameter p = 0.15.
         masked_indices = torch.bernoulli(probability_matrix).bool()
         labels[~masked_indices] = -100  # We only compute loss on masked tokens
 
@@ -146,7 +140,7 @@ training_args=TrainingArguments(
     # include_inputs_for_metrics=True
 )
 config=AlbertConfig.from_pretrained("/root/autodl-tmp/xlnet-base") # model config directory 
-model = SVTForPretraining(config)
+model = DFTForPretraining(config)
 trainer=Trainer(
     model=model,
     args=training_args,
