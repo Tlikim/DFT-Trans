@@ -1,6 +1,6 @@
 import torch.nn as nn
 import torch
-from .svt10 import SVT10
+from .dft_trans import DFT_Trans
 from torch.nn.init import trunc_normal_
 import math
 from torch.nn import CrossEntropyLoss
@@ -9,7 +9,7 @@ class BertForSequenceClassification(BertPreTrainedModel):# AlbertPreTrainedModel
     def __init__(self, config: AlbertConfig): # AlbertConfig
         super().__init__(config)
         self.num_labels=config.num_labels
-        self.model=SVT10(config)
+        self.model=DFT_Trans(config)
         # self.model = AutoModelForCausalLM.from_config(config, trust_remote_code=True).bert
         # self.pooler = Pooler(config.hidden_size)
         self.dropout = nn.Dropout(0.1)
