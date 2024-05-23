@@ -1,4 +1,2 @@
-from .svt_squad import BertForQuestionAnswering
-from .svt_glue import BertForSequenceClassification
-from .svt_roberta1 import RobertaForSequenceClassification
-from .hypermixing_glue import HyperMixForSequenceClassification
+from .dft_squad import BertForQuestionAnswering
+from .dft_glue import BertForSequenceClassification
