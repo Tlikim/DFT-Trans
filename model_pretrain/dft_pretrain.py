@@ -5,9 +5,9 @@ from torch.nn.init import trunc_normal_
 from transformers.activations import ACT2FN
 from typing import Union, Tuple, Optional
 from transformers.models.bert.modeling_bert import BertForPreTrainingOutput
-from svt9 import SVT9
+from dft_trans import DFT_Trans
 from transformers import AlbertPreTrainedModel, AlbertConfig
-class SVTPredictionHeadTransform(nn.Module):
+class DFTPredictionHeadTransform(nn.Module):
     def __init__(self, config: AlbertConfig):
         super().__init__()
         self.dense = nn.Linear(config.hidden_size, config.hidden_size)
@@ -27,10 +27,10 @@ class SVTPredictionHeadTransform(nn.Module):
         hidden_states = self.transform_act_fn(hidden_states)
         hidden_states = self.LayerNorm(hidden_states)
         return hidden_states
-class SVTLMPredictionHead(nn.Module):
+class DFTLMPredictionHead(nn.Module):
     def __init__(self, config: AlbertConfig):
         super().__init__()
-        self.transform = SVTPredictionHeadTransform(config)
+        self.transform = DFTPredictionHeadTransform(config)
         self.decoder = nn.Linear(config.hidden_size, config.vocab_size, bias=False)
         # self.bias = nn.Parameter(torch.zeros(vocab_size))
         self.decoder.bias = nn.Parameter(torch.zeros(config.vocab_size))
@@ -44,10 +44,10 @@ class SVTLMPredictionHead(nn.Module):
         hidden_states = self.transform(hidden_states)
         hidden_states = self.decoder(hidden_states)
         return hidden_states
-class SVTPreTrainingHeads(nn.Module):
+class DFTPreTrainingHeads(nn.Module):
     def __init__(self, config: AlbertConfig):
         super().__init__()
-        self.predictions = SVTLMPredictionHead(config)
+        self.predictions = DFTLMPredictionHead(config)
         self.seq_relationship = nn.Linear(config.hidden_size, 2)
         self.apply(self._init_weights)
     def _init_weights(self, m):
@@ -59,12 +59,12 @@ class SVTPreTrainingHeads(nn.Module):
         prediction_scores = self.predictions(sequence_output)
         seq_relationship_score = self.seq_relationship(pooled_output)
         return prediction_scores, seq_relationship_score
-class SVTForPretraining(AlbertPreTrainedModel):
+class DFTForPretraining(AlbertPreTrainedModel):
     def __init__(self, config: AlbertConfig):
         super().__init__(config)
         self.config=config
-        self.model = SVT9(config)
-        self.cls = SVTPreTrainingHeads(config)
+        self.model = DFT_Trans(config)
+        self.cls = DFTPreTrainingHeads(config)
     def forward(
         self,
         input_ids: Optional[torch.Tensor] = None,
