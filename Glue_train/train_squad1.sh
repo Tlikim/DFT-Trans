@@ -1,0 +1,16 @@
+CUDA_VISIBLE_DEVICES=0 python3 code/run_squad.py \
+  --do_train \
+  --do_eval \
+  --model /root/autodl-tmp/our_bert_chinese \
+  --train_file ./train-v1.1.json \
+  --dev_file ./dev-v1.1.json \
+  --test_file ./test_file \
+  --train_batch_size 32 \
+  --eval_batch_size 32  \
+  --learning_rate 3e-5 \
+  --num_train_epochs 10 \
+  --max_seq_length 256 \
+  --doc_stride 128 \
+  --eval_metric f1 \
+  --output_dir squad_output \
+  --eval_per_epoch 2
