@@ -1,4 +1,3 @@
-# Copyright (c) 2019, Facebook, Inc. and its affiliates. All Rights Reserved
 """BERT finetuning runner."""
 
 from __future__ import absolute_import, division, print_function
@@ -729,7 +728,6 @@ def main(args):
 
     # tokenizer = BertTokenizer.from_pretrained(args.model, do_lower_case=args.do_lower_case)
     tokenizer = AlbertTokenizerFast.from_pretrained(args.model, do_lower_case=args.do_lower_case)
-    # tokenizer = RobertaTokenizer.from_pretrained(args.model, do_lower_case=args.do_lower_case)
 
     if args.do_train or (not args.eval_test):
         if task_name == "mnli":
@@ -794,25 +792,11 @@ def main(args):
             [1e-6, 2e-6, 3e-6, 5e-6, 1e-5, 2e-5, 3e-5, 5e-5]
         # config = BertConfig.from_pretrained("/root/autodl-tmp/mosaic_bert_base/", num_labels=num_labels)
         config = AlbertConfig.from_pretrained("/root/autodl-tmp/our_bert", num_labels=num_labels)
-        # config = RobertaConfig.from_pretrained("/root/autodl-tmp/ROBERTA-base", num_labels=num_labels)
         # print(config)
         for lr in lrs:
-            # cache_dir = args.cache_dir if args.cache_dir else \
-            #     PYTORCH_PRETRAINED_BERT_CACHE
-            # model = BertForSequenceClassification.from_pretrained(
-            #     args.model, cache_dir=cache_dir, num_labels=num_labels)
-            # model = AlbertForSequenceClassification(config)
-            # model = BertForSequenceClassification(config=config, num_labels=num_labels)
-            # model = RobertaForSequenceClassification(config=config)
-            # model.roberta.load_state_dict(torch.load("/root/autodl-tmp/roberta-svt/original.bin"))
-            # model = BertForSequenceClassification(in_chans=768,num_classes=num_labels, num_stages=2, embed_dims=768, stem_hidden_dim=768, drop_path_rate=0.1,num_heads=12,norm_layer=partial(nn.LayerNorm,eps=1e-12), token_label=False,mlp_ratios=[2,1], vocab_size=30522)
-            # model.model.load_state_dict(torch.load("/root/autodl-tmp/our_bert_chinese/original.bin"))
-            # model = BertForSequenceClassification(in_chans=512,num_classes=num_labels, num_stages=2, embed_dims=512, stem_hidden_dim=512, drop_path_rate=0.1,num_heads=8,norm_layer=partial(nn.LayerNorm,eps=1e-12), token_label=False,mlp_ratios=[2,1], vocab_size=30000)
             model = BertForSequenceClassification(config)
             # model = HyperMixForSequenceClassification(config)
-            # print("导入成功!!!")
             model.model.load_state_dict(torch.load("/root/autodl-tmp/our_bert/original.bin"))
-            # model.model.load_state_dict(torch.load("/root/autodl-tmp/albert-svt/original.bin"))
             if args.fp16:
                 model.half()
             model.to(device)
