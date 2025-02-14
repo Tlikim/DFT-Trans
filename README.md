@@ -1,5 +1,5 @@
 # DFT-Trans
-This is the official implementation of paper "DFT-Trans: Pretraining Cost Reduction via Domain Mixing Tokens of Time and Frequency for NLP Tasks"  
+This is the official implementation of paper "DFT-Trans: A Bidirectional Encoder for Efficient Fusion of Time-Frequency Domain Textual Features"  
 ## Pretrain Corpus
 We are providing the corpus used to pretrain the model.  
 [C4](https://huggingface.co/datasets/allenai/c4), [Wikipeidia](https://huggingface.co/datasets/wikipedia) and 
